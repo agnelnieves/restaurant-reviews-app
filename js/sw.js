@@ -1,6 +1,6 @@
 console.log('SW registered');
 
-var cacheName = 'V2'
+var cacheName = 'V1'
 var filesToCache = [
     '/',
     '/index.html',
@@ -22,6 +22,7 @@ var filesToCache = [
     '/img/10.jpg',
     ]
 
+// Executes when installing the SW for the first time
 self.addEventListener('install', function(event) {
     event.waitUntil(
       caches.open(cacheName).then(function(cache) {
@@ -29,3 +30,28 @@ self.addEventListener('install', function(event) {
       })
     );
   });
+
+self.addEventListener('fetch', function(e) {
+    e.respondWith(
+        caches.match(e.request).then(function(response) {
+            if (response) {
+                console.log('Found', e.request, ' in cache');
+                return response;
+            }
+            else {
+                console.log('Not found:', e.request, ' in cache');
+                return fetch(e.request)
+                .then(function(response) {
+                    const clonedResponse = response.clone();
+                    caches.open('V1').then(function(cache){
+                        cache.put(e.request, clonedResponse);
+                    })
+                    return response;
+                })
+                .catch(function(err){
+                    console.error(err);
+                });
+            };
+        })
+    );
+});
