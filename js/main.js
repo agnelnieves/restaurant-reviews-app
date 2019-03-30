@@ -210,3 +210,11 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 } */
 
+// SERVICE WORKER
+
+// Checks if the browser supports serviceWorkers
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('../js/sw.js');
+  });
+}
